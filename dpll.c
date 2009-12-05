@@ -34,10 +34,10 @@ bool dpll_hlpr(unsigned int depth){
 	if(mynumsat==nbvar)
 		return true;
 	
-	//if(mynumsat!=-1){
+	if(mynumsat!=-1){
 		if(dpll_hlpr(depth+1))
 			return true;
-	//}
+	}
 	
 
 	partial_assign[depth]=0;
@@ -49,10 +49,10 @@ bool dpll_hlpr(unsigned int depth){
 	if(mynumsat==nbvar)
 		return true;
 	
-	//if(mynumsat!=-1){
+	if(mynumsat!=-1){
 		if(dpll_hlpr(depth+1))
 			return true;
-	//}
+	}
 		
 	return false;
 	
