@@ -160,7 +160,7 @@ __host__ bool dpll_hlpr(unsigned int depth)
 }
 
 
-__host__ bool cuda_dpll_hlpr(unsigned int depth)
+__host__ bool test_cuda_dpll_hlpr(unsigned int depth)
 {
 	int mynumsat,mynumsat2;
 
@@ -194,7 +194,7 @@ __host__ bool cuda_dpll_hlpr(unsigned int depth)
 
 	if(mynumsat!=-1)
 	{
-		if(cuda_dpll_hlpr(depth+1))
+		if(test_cuda_dpll_hlpr(depth+1))
 			return true;
 	}
 
