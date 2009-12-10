@@ -8,7 +8,7 @@
 
 #define BUFF_SZ 255
 
-#define NUM_BLOCK 1
+#define NUM_BLOCK 16
 #define NUM_THREADS 32
 
 #define MAX_ASSIGN_SIZE 4096
@@ -44,10 +44,10 @@ __global__ void cuda_sat_eval (char* partial_assign, unsigned int num_clauses ,s
 
 	for(int i=1;i<=blocksize;i++)
 	{
-		if((myid*blocksize+i) < assign_size)
+		if((threadIdx.x*blocksize+i) < assign_size)
 		{
-			passign[myid*blocksize+i]=partial_assign[myid*blocksize+i];
-//			printf(" partial assign index %d , cpu data %d , gpu data %d \n", myid*blocksize+i, partial_assign[myid*blocksize+i], passign[myid*blocksize+i]);
+			passign[threadIdx.x*blocksize+i]=partial_assign[threadIdx.x*blocksize+i];
+//			printf(" partial assign index %d , cpu data %d , gpu data %d \n", threadIdx.x*blocksize+i, partial_assign[threadIdx.x*blocksize+i], passign[threadIdx.x*blocksize+i]);
 		}
 	}
 	__syncthreads();
@@ -59,7 +59,7 @@ __global__ void cuda_sat_eval (char* partial_assign, unsigned int num_clauses ,s
 
 	clause_count[threadIdx.x] = 0 ;
 	
-	for(int ii=myid;ii<num_clauses;ii+=NUM_THREADS)
+	for(int ii=myid;ii<num_clauses;ii+=NUM_THREADS*NUM_BLOCK)
 	{
 		v1=(passign[abs(problem[3*ii])]^((problem[3*ii]>>(15))&1));
 		v2=(passign[abs(problem[3*ii+1])]^((problem[3*ii+1]>>(15))&1));
@@ -81,8 +81,8 @@ __global__ void cuda_sat_eval (char* partial_assign, unsigned int num_clauses ,s
 	}
 
 	__syncthreads();
-
-/*	if(threadIdx.x == 0)
+/*
+	if(threadIdx.x == 0)
 	{
 		printf("\n Clause Count Values \n");
 		for (int tempint = 0 ; tempint < NUM_THREADS ; tempint ++)
@@ -160,7 +160,7 @@ __host__ bool dpll_hlpr(unsigned int depth)
 }
 
 
-__host__ bool test_cuda_dpll_hlpr(unsigned int depth)
+__host__ bool cuda_dpll_hlpr(unsigned int depth)
 {
 	int mynumsat,mynumsat2;
 
@@ -194,7 +194,7 @@ __host__ bool test_cuda_dpll_hlpr(unsigned int depth)
 
 	if(mynumsat!=-1)
 	{
-		if(test_cuda_dpll_hlpr(depth+1))
+		if(cuda_dpll_hlpr(depth+1))
 			return true;
 	}
 
